@@ -16,7 +16,6 @@ use Flarum\Notification\Event\Sending;
 use Flarum\Notification\MailableInterface;
 use Flarum\Notification\Notification;
 use Flarum\Notification\NotificationMailer;
-use Flarum\Notification\NotificationSyncer;
 use Flarum\Queue\AbstractJob;
 use Flarum\User\User;
 
@@ -45,7 +44,7 @@ class SendNotificationsJob extends AbstractJob
 
         event(new Sending($this->blueprint, $recipients));
 
-        $attributes = NotificationSyncer::getAttributes($this->blueprint);
+        $attributes = $this->blueprint->getAttributes();
 
         Notification::insert(
             array_map(function (User $user) use ($attributes, $now) {
