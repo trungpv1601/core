@@ -15,7 +15,6 @@ use Flarum\Notification\Event\Notifying;
 use Flarum\Notification\Event\Sending;
 use Flarum\Notification\MailableInterface;
 use Flarum\Notification\Notification;
-use Flarum\Notification\NotificationMailer;
 use Flarum\Queue\AbstractJob;
 use Flarum\User\User;
 
@@ -27,20 +26,20 @@ class SendNotificationsJob extends AbstractJob
     private $blueprint;
 
     /**
-     * @var array
+     * @var User[]
      */
-    private $recipientIds;
+    private $recipients;
 
-    public function __construct(BlueprintInterface $blueprint, array $recipientIds = [])
+    public function __construct(BlueprintInterface $blueprint, array $recipients = [])
     {
         $this->blueprint = $blueprint;
-        $this->recipientIds = $recipientIds;
+        $this->recipients = $recipients;
     }
 
-    public function handle(NotificationMailer $mailer)
+    public function handle()
     {
         $now = Carbon::now('utc')->toDateTimeString();
-        $recipients = $this->recipientIds;
+        $recipients = $this->recipients;
 
         event(new Sending($this->blueprint, $recipients));
 
@@ -58,16 +57,7 @@ class SendNotificationsJob extends AbstractJob
         event(new Notifying($this->blueprint, $recipients));
 
         if ($this->blueprint instanceof MailableInterface) {
-            $this->email($mailer, $this->blueprint, $recipients);
-        }
-    }
-
-    protected function email(NotificationMailer $mailer, MailableInterface $blueprint, array $recipients)
-    {
-        foreach ($recipients as $user) {
-            if ($user->shouldEmail($blueprint::getType())) {
-                $mailer->send($blueprint, $user);
-            }
+            $this->chain([new SendEmailNotificationJob($this->blueprint, $recipients)]);
         }
     }
 }
