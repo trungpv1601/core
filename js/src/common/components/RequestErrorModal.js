@@ -16,7 +16,11 @@ export default class RequestErrorModal extends Modal {
 
     let responseText;
 
-    if (!formattedError) {
+    // If the error is already formatted, just add line endings;
+    // else try to parse it as JSON and stringify it with indentation
+    if (formattedError) {
+      responseText = formattedError.join('\n\n');
+    } else {
       try {
         const json = error.response || JSON.parse(error.responseText);
 
@@ -24,8 +28,6 @@ export default class RequestErrorModal extends Modal {
       } catch (e) {
         responseText = error.responseText;
       }
-    } else {
-      responseText = formattedError.join('\n\n');
     }
 
     return <div className="Modal-body">
