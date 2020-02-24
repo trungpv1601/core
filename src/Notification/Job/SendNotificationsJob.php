@@ -13,7 +13,6 @@ use Carbon\Carbon;
 use Flarum\Notification\Blueprint\BlueprintInterface;
 use Flarum\Notification\Event\Notifying;
 use Flarum\Notification\Event\Sending;
-use Flarum\Notification\MailableInterface;
 use Flarum\Notification\Notification;
 use Flarum\Queue\AbstractJob;
 use Flarum\User\User;
