@@ -55,9 +55,5 @@ class SendNotificationsJob extends AbstractJob
         );
 
         event(new Notifying($this->blueprint, $recipients));
-
-        if ($this->blueprint instanceof MailableInterface) {
-            $this->chain([new SendEmailNotificationJob($this->blueprint, $recipients)]);
-        }
     }
 }
